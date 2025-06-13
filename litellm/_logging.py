@@ -10,10 +10,10 @@ if set_verbose is True:
     logging.warning(
         "`litellm.set_verbose` is deprecated. Please set `os.environ['LITELLM_LOG'] = 'DEBUG'` for debug logs."
     )
-json_logs = bool(os.getenv("JSON_LOGS", False))
+json_logs = os.getenv("JSON_LOGS", "").lower() in ("true", "1", "yes", "enabled")
 # Create a handler for the logger (you may need to adapt this based on your needs)
 log_level = os.getenv("LITELLM_LOG", "DEBUG")
-numeric_level: str = getattr(logging, log_level.upper())
+numeric_level: int = getattr(logging, log_level.upper())
 handler = logging.StreamHandler()
 handler.setLevel(numeric_level)
 
@@ -108,6 +108,4 @@ def _is_debugging_on() -> bool:
     """
     Returns True if debugging is on
     """
-    if verbose_logger.isEnabledFor(logging.DEBUG) or set_verbose is True:
-        return True
-    return False
+    return any(handler.level <= logging.DEBUG for handler in verbose_logger.handlers) or set_verbose is True
