@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "litellm"
-version = "1.73.6.rc.2"
+version = "1.73.6+area22.1"
 description = "Library to easily interface with LLM API providers"
 authors = ["BerriAI"]
 license = "MIT"
@@ -17,6 +17,11 @@ repository = "https://github.com/BerriAI/litellm"
 Repository = "https://github.com/BerriAI/litellm"
 documentation = "https://docs.litellm.ai"
 Documentation = "https://docs.litellm.ai"
+
+[[tool.poetry.source]]
+name = "area22"
+url = "https://area22-493334834594.d.codeartifact.eu-west-1.amazonaws.com/pypi/area22/simple"
+priority = "supplemental"
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0, !=3.9.7"
