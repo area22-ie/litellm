@@ -3107,6 +3107,12 @@ def _init_custom_logger_compatible_class(  # noqa: PLR0915
             _in_memory_loggers.append(_literalai_logger)
             return _literalai_logger  # type: ignore
         elif logging_integration == "prometheus":
+            if "LITELLM_LICENSE" not in os.environ:
+                verbose_logger.debug(
+                    f"Prometheus Logger suppressed due to no LITELLM_LICENSE"
+                )
+                return None
+
             for callback in _in_memory_loggers:
                 if isinstance(callback, PrometheusLogger):
                     return callback  # type: ignore
