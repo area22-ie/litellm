@@ -996,7 +996,7 @@ class AmazonConverseConfig(BaseConfig):
         # update model with server side latency
         latency = completion_response.get("metrics", {}).get("latencyMs", 0)
         if latency > 0:
-            model_response._hidden_params["latencyMs"] = latency
+            model_response._hidden_params["latency_ms"] = latency
 
         model_response.created = int(time.time())
         model_response.model = model
