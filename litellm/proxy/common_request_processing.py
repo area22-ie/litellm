@@ -226,6 +226,9 @@ class ProxyBaseLLMRequestProcessing:
             ),
             "x-litellm-timeout": str(timeout) if timeout is not None else None,
             **{k: str(v) for k, v in kwargs.items()},
+            # upper case are converted to lower case somewhere else
+            # use "-" to separate "ms" instead of original "Ms"
+            "latency-ms": hidden_params.get("latencyMs", None)
         }
         if request_data:
             remaining_tokens_header = (
