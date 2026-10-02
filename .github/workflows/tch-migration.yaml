@@ -1,0 +1,46 @@
+name: Migration to Telus Connected Home
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: mirror-to-tch
+  cancel-in-progress: false
+
+env:
+  TCH_OWNER: TELUS-Connected-Home
+  TCH_REPO: tch-sh-smarthome-assistant-litellm
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate TCH installation token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          client-id: ${{ secrets.TCH_CLIENT_ID }}
+          private-key: ${{ secrets.TCH_APP_PRIVATE_KEY }}
+          owner: ${{ env.TCH_OWNER }}
+          repositories: ${{ env.TCH_REPO }}
+
+      - name: Checkout main branch (source)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Push main branch to TCH
+        run: |
+          SRC_DATE=$(git log -1 --format=%cI)
+          git remote add tch "https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ env.TCH_OWNER }}/${{ env.TCH_REPO }}.git"
+          git checkout --orphan snapshot
+          git add -A
+          GIT_AUTHOR_DATE="$SRC_DATE" GIT_COMMITTER_DATE="$SRC_DATE" \
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "migrate to TCH"
+          git push tch snapshot:refs/heads/main --force
